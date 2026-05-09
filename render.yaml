@@ -1,24 +1,11 @@
 services:
-  # ── Backend FastAPI ──────────────────────────────────────────────────────
   - type: web
-    name: fraud-detection-api
+    name: fraud-detection
     runtime: python
-    buildCommand: pip install -r backend/requirements.txt
+    # Build : frontend d'abord (génère dist/), puis dépendances Python
+    buildCommand: cd frontend && npm install && npm run build && cd .. && pip install -r backend/requirements.txt
+    # Start : FastAPI sert l'API + les fichiers statiques du frontend
     startCommand: cd backend && PYTHONPATH=. uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"
-
-  # ── Frontend Vite/React (site statique) ─────────────────────────────────
-  - type: static
-    name: fraud-detection-ui
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        # À mettre à jour après le premier déploiement du backend
-        value: https://fraud-detection-api.onrender.com/api
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
