@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL: "/api" });
+// En dev : proxy Vite → localhost:8001/api
+// En prod : VITE_API_URL pointe vers le backend Render
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL ?? "/api",
+});
 
 // EDA
 export const uploadDataset  = (file) => {
