@@ -3,28 +3,22 @@ services:
   - type: web
     name: fraud-detection-api
     runtime: python
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: "PYTHONPATH=. uvicorn src.api.main:app --host 0.0.0.0 --port $PORT"
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && PYTHONPATH=. uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"
-    # Plan gratuit Render : le service s'endort après 15 min d'inactivité
-    # Passer à "starter" pour éviter le cold start
 
   # ── Frontend Vite/React (site statique) ─────────────────────────────────
   - type: static
     name: fraud-detection-ui
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        # Remplace par l'URL réelle du backend après son premier déploiement
-        # ex : https://fraud-detection-api.onrender.com/api
+        # À mettre à jour après le premier déploiement du backend
         value: https://fraud-detection-api.onrender.com/api
     routes:
-      # SPA routing : toutes les URLs inconnues renvoient vers index.html
       - type: rewrite
         source: /*
         destination: /index.html
